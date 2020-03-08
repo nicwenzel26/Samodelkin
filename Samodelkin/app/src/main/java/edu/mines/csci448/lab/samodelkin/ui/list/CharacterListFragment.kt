@@ -7,6 +7,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,9 +18,6 @@ import java.util.*
 
 class CharacterListFragment : Fragment() {
 
-    interface Callbacks {
-        fun onCharacterSelected(characterId: UUID)
-    }
 
     private val logTag = "448.CharListFrag"
 
@@ -28,13 +26,12 @@ class CharacterListFragment : Fragment() {
     private lateinit var characterRecyclerView: RecyclerView
     private lateinit var adapter: CharacterListAdapter
 
-    private var callbacks: Callbacks? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Log.d(logTag, "onAttach() called")
 
-        callbacks = context as Callbacks?
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +51,9 @@ class CharacterListFragment : Fragment() {
         characterRecyclerView.layoutManager = LinearLayoutManager(context)
 
         adapter = CharacterListAdapter(characterListViewModel) { character: Character -> Unit
-            // TODO launch CharacterDetailFragment
-            callbacks?.onCharacterSelected(character.id)
+            val action = CharacterListFragmentDirections.actionCharacterListFragmentToCharacterDetailFragment(character.id)
+            findNavController().navigate(action)
+
         }
         characterRecyclerView.adapter = adapter
 
@@ -137,7 +135,7 @@ class CharacterListFragment : Fragment() {
         Log.d(logTag, "onDetach() called")
         super.onDetach()
 
-        callbacks = null
+
     }
 
     private fun updateUI(characters: PagedList<Character>) {

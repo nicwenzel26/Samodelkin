@@ -3,13 +3,14 @@ package edu.mines.csci448.lab.samodelkin.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import edu.mines.csci448.lab.samodelkin.R
 import edu.mines.csci448.lab.samodelkin.ui.detail.CharacterDetailFragment
 import edu.mines.csci448.lab.samodelkin.ui.list.CharacterListFragment
 import java.util.*
 
-class MainActivity : AppCompatActivity(),
-    CharacterListFragment.Callbacks {
+class MainActivity : AppCompatActivity() {
 
     private val logTag = "448.MainActivity"
 
@@ -18,16 +19,10 @@ class MainActivity : AppCompatActivity(),
         Log.d(logTag, "onCreate() called")
         setContentView(R.layout.activity_main)
 
-        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
-        if(currentFragment == null) {
-            val listFragment = CharacterListFragment()
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragment_container, listFragment)
-                .commit()
-        }
+        NavigationUI.setupActionBarWithNavController(this, findNavController(R.id.nav_host_fragment))
     }
+
+    override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()||super.onSupportNavigateUp()
 
     override fun onStart() {
         super.onStart()
@@ -54,7 +49,7 @@ class MainActivity : AppCompatActivity(),
         super.onDestroy()
     }
 
-    override fun onCharacterSelected(characterId: UUID) {
+    fun onCharacterSelected(characterId: UUID) {
         Log.d(logTag, "onCharacterSelected() called")
         val fragment = CharacterDetailFragment.newInstance(characterId)
         supportFragmentManager.beginTransaction()
