@@ -1,5 +1,6 @@
 package edu.mines.csci448.lab.samodelkin.ui.generate
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,13 +9,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import edu.mines.csci448.lab.samodelkin.R
 import edu.mines.csci448.lab.samodelkin.data.Character
+import edu.mines.csci448.lab.samodelkin.ui.MainActivity
 import edu.mines.csci448.lab.samodelkin.util.CharacterGenerator
+import edu.mines.csci448.lab.samodelkin.util.CharacterWorker
+import edu.mines.csci448.lab.samodelkin.util.NetworkConnectionUtil
 
 private const val CHARACTER_DATA_BUNDLE_KEY = "448.labs.CHARACTER_DATA_BUNDLE_KEY"
 
@@ -78,8 +86,24 @@ class GenerateCharacterFragment : Fragment() {
             displayCharacterData()
         }
 
-        // TODO Step II.1
-        apiButton.isEnabled = false
+        apiButton.setOnClickListener {
+            val workRequest = OneTimeWorkRequest.Builder(CharacterWorker::class.java).build()
+
+            workManager.enqueue(workRequest)
+
+            workManager.getWorkInfoByIdLiveData(workRequest.id).observe(viewLifecycleOwner, Observer { workInfo ->
+                when(workInfo.state) {
+                    WorkInfo.State.SUCCEEDED -> {
+                        val apiData = CharacterWorker.getApiData(workInfo.outputData)
+                        if(apiData != null) {
+                            characterData = CharacterGenerator.fromApiData(apiData)
+                            displayCharacterData()
+                        }
+
+                    }
+                }
+            })
+        }
 
         saveButton.setOnClickListener {
             generateCharacterViewModel.addCharacter(characterData)
@@ -114,6 +138,13 @@ class GenerateCharacterFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        apiButton.isEnabled = NetworkConnectionUtil.isNetworkAvailableAndConnected(activity as Activity)
+
+        if(!apiButton.isEnabled) {
+            Toast.makeText(context, R.string.internet_reason, Toast.LENGTH_SHORT).show()
+        }
+
         Log.d(logTag, "onResume() called")
     }
 

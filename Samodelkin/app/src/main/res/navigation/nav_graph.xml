@@ -14,7 +14,8 @@
             app:argType="java.util.UUID" />
         <action
             android:id="@+id/action_characterDetailFragment_to_characterListFragment"
-            app:destination="@id/characterListFragment" />
+            app:destination="@id/characterListFragment"
+            app:popUpTo="@+id/characterListFragment" />
     </fragment>
     <fragment
         android:id="@+id/characterListFragment"
@@ -35,6 +36,7 @@
         tools:layout="@layout/fragment_new_character">
         <action
             android:id="@+id/action_generateCharacterFragment_to_characterListFragment"
-            app:destination="@id/characterListFragment" />
+            app:destination="@id/characterListFragment"
+            app:popUpTo="@+id/characterListFragment" />
     </fragment>
 </navigation>
