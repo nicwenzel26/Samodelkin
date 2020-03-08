@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.work.WorkManager
 import edu.mines.csci448.lab.samodelkin.R
 import edu.mines.csci448.lab.samodelkin.data.Character
@@ -82,7 +83,8 @@ class GenerateCharacterFragment : Fragment() {
 
         saveButton.setOnClickListener {
             generateCharacterViewModel.addCharacter(characterData)
-            // TODO return to CharacterListFragment
+            val action = GenerateCharacterFragmentDirections.actionGenerateCharacterFragmentToCharacterListFragment()
+            findNavController().navigate(action)
         }
 
         return view

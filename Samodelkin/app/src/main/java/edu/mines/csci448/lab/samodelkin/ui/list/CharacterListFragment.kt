@@ -89,7 +89,8 @@ class CharacterListFragment : Fragment() {
         Log.d(logTag, "onOptionsItemSelected() called")
         return when (item.itemId) {
             R.id.new_character_menu_item -> {
-                // TODO launch GenerateCharacterFragment
+                val action = CharacterListFragmentDirections.actionCharacterListFragmentToGenerateCharacterFragment()
+                findNavController().navigate(action)
                 true
             }
             else -> super.onOptionsItemSelected(item)
