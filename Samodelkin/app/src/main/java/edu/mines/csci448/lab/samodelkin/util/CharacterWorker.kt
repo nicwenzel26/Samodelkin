@@ -22,10 +22,9 @@ class CharacterWorker(context: Context, workerParams: WorkerParameters) : Worker
     override fun doWork(): Result {
         Log.d(logTag, "Work request triggered" )
 
-        URL(CHARACTER_DATA_API).readText()
+        val urlStringResults = URL(CHARACTER_DATA_API).readText()
 
-        val outputData = workDataOf(CHARACTER_API_KEY to urlStringResult)
-
+        val outputData = workDataOf(CHARACTER_API_KEY to urlStringResults)
         return Result.success(outputData)
     }
 
